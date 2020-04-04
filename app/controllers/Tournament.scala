@@ -225,6 +225,14 @@ final class Tournament(
     }
   }
 
+  def innerTeamForm(teamId: TeamID) = Auth { implicit ctx => me =>
+    NoLameOrBot {
+      teamC.teamsIBelongTo(me) map { teams =>
+        Ok(html.tournament.form.create(forms.create(me, team = teams.find(_._id == teamId)), me, teams))
+      }
+    }
+  }
+
   def teamBattleForm(teamId: TeamID) = Auth { implicit ctx => me =>
     NoLameOrBot {
       env.team.api.owns(teamId, me.id) map {

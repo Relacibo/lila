@@ -9,15 +9,17 @@ import play.api.data.validation.{ Constraint, Constraints }
 import chess.Mode
 import chess.StartingPosition
 import lila.common.Form._
+import lila.hub.LightTeam
 import lila.hub.LightTeam._
+import lila.tournament.Condition.DataForm.TeamMemberSetup
 import lila.user.User
 
 final class DataForm {
 
   import DataForm._
 
-  def create(user: User, teamBattleId: Option[TeamID] = None) = form fill TournamentSetup(
-    name = canPickName(user) && teamBattleId.isEmpty option user.titleUsername,
+  def create(user: User, teamBattleId: Option[TeamID] = None, team: Option[LightTeam] = None) = form fill TournamentSetup(
+    name = canPickName(user) && teamBattleId.isEmpty option team.map(_.name).getOrElse(user.titleUsername),
     clockTime = clockTimeDefault,
     clockIncrement = clockIncrementDefault,
     minutes = minuteDefault,
@@ -28,7 +30,8 @@ final class DataForm {
     password = None,
     mode = none,
     rated = true.some,
-    conditions = Condition.DataForm.AllSetup.default,
+    conditions = Condition.DataForm.AllSetup.default
+      .copy(teamMember = team.isDefined option TeamMemberSetup(team.map(_._id))),
     teamBattleByTeam = teamBattleId,
     berserkable = true.some
   )

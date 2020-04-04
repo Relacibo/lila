@@ -79,7 +79,13 @@ object show {
                   href := routes.Tournament.teamBattleForm(t.id),
                   cls := "button button-empty text",
                   dataIcon := "g"
-                )(teamBattle())
+                )(teamBattle()),
+              info.mine option
+                a(
+                  href := routes.Tournament.innerTeamForm(t.id),
+                  cls := "button button-empty text",
+                  dataIcon := "O"
+                )(trans.createANewTournament())
             ),
             div(cls := "team-show__tour-forum")(
               info.teamBattles.nonEmpty option frag(

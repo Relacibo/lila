@@ -215,6 +215,7 @@ GET   /tournament                             controllers.Tournament.home(page: 
 GET   /tournament/featured                    controllers.Tournament.featured
 GET   /tournament/new                         controllers.Tournament.form
 POST  /tournament/new                         controllers.Tournament.create
+GET   /tournament/inner-team/new/:teamId      controllers.Tournament.innerTeamForm(teamId: String)
 GET   /tournament/team-battle/new/:teamId     controllers.Tournament.teamBattleForm(teamId: String)
 GET   /tournament/team-battle/edit/:id        controllers.Tournament.teamBattleEdit(id: String)
 POST  /tournament/team-battle/edit/:id        controllers.Tournament.teamBattleUpdate(id: String)
