@@ -1,7 +1,6 @@
 import { h } from 'snabbdom'
 import { VNode } from 'snabbdom/vnode';
 import { spinner, bind, numberRow, playerName, dataIcon, player as renderPlayer, miniBoard } from './util';
-import { opposite } from 'chessground/util';
 import { teamName } from './battle';
 import * as status from 'game/status';
 import TournamentController from '../ctrl';
@@ -31,27 +30,26 @@ function setup(vnode: VNode) {
 }
 
 function previewPlayer(player) {
-  return h('div.tour__preview__player', [
-    h('strong', '#' + player.rank),
+  console.log(player)
+  let ret = h('div.tour__featured__player', [
     renderPlayer(player, true, true, false),
-    player.berserk ? h('i', {
-      attrs: {
-        'data-icon': '`',
-        title: 'Berserk'
-      }
-    }) : null
   ]);
+  console.log(ret)
+  return ret
 }
 
-function preview(f): VNode {
-  return h('div.tour__preview', [
-    previewPlayer(f[opposite(f.color)]),
-    miniBoard(f),
-    previewPlayer(f[f.color])
+function preview(player, pairing): VNode {
+  let ret = h('div.tour__featured', [
+    previewPlayer(pairing.op),
+    miniBoard(pairing),
+    previewPlayer(player)
   ]);
+  console.log(ret)
+  return ret
 }
 
 export default function(ctrl: TournamentController): VNode {
+  console.log(ctrl)
   const data = ctrl.playerInfo.data;
   const noarg = ctrl.trans.noarg;
   const tag = 'div.tour__player-info.tour__actor-info';
@@ -62,13 +60,13 @@ export default function(ctrl: TournamentController): VNode {
     ])
   ]);
   const nb = data.player.nb,
-    pairingsLen = data.pairings.length,
-    pairingsHead = pairingsLen ? data.pairings[0] : null,
-    runningPairing = pairingsHead && pairingsHead.status == status.ids.started ? pairingsHead : null,
-    avgOp = pairingsLen ? Math.round(data.pairings.reduce(function(a, b) {
-      return a + b.op.rating;
-    }, 0) / pairingsLen) : undefined;
-  return h(tag, {
+  pairingsLen = data.pairings.length,
+  pairingsHead = pairingsLen ? data.pairings[0] : null,
+  runningPairing = pairingsHead && pairingsHead.status === status.ids.started ? pairingsHead : null,
+  avgOp = pairingsLen ? Math.round(data.pairings.reduce(function(a, b) {
+    return a + b.op.rating;
+  }, 0) / pairingsLen) : undefined;
+  let ret = h(tag, {
     hook: {
       insert: setup,
       postpatch(_, vnode) { setup(vnode) }
@@ -88,15 +86,15 @@ export default function(ctrl: TournamentController): VNode {
           noarg('performance'),
           data.player.performance + (nb.game < 3 ? '?' : ''),
           'raw') : null,
-        numberRow(noarg('gamesPlayed'), nb.game),
-        ...(nb.game ? [
-          numberRow(noarg('winRate'), [nb.win, nb.game], 'percent'),
-          numberRow(noarg('berserkRate'), [nb.berserk, nb.game], 'percent'),
-          numberRow(noarg('averageOpponent'), avgOp, 'raw')
-        ] : [])
+          numberRow(noarg('gamesPlayed'), nb.game),
+          ...(nb.game ? [
+            numberRow(noarg('winRate'), [nb.win, nb.game], 'percent'),
+            numberRow(noarg('berserkRate'), [nb.berserk, nb.game], 'percent'),
+            numberRow(noarg('averageOpponent'), avgOp, 'raw')
+          ] : [])
       ])
     ]),
-    runningPairing ? preview(runningPairing) : null,
+    runningPairing ? preview(data.playerInfo, runningPairing) : null,
     h('div', [
       h('table.pairings.sublist', {
         hook: bind('click', e => {
@@ -104,21 +102,23 @@ export default function(ctrl: TournamentController): VNode {
           if (href) window.open(href, '_blank');
         })
       }, data.pairings.map(function(p, i) {
-          const res = result(p.win, p.status);
-          return h('tr.glpt.' + (res === '1' ? ' win' : (res === '0' ? ' loss' : '')), {
-            key: p.id,
-            attrs: { 'data-href': '/' + p.id + '/' + p.color },
-            hook: {
-              destroy: vnode => $.powerTip.destroy(vnode.elm as HTMLElement)
-            }
-          }, [
-            h('th', '' + (Math.max(nb.game, pairingsLen) - i)),
-            h('td', playerName(p.op)),
-            h('td', p.op.rating),
-            h('td.is.color-icon.' + p.color),
-            h('td', res)
-          ]);
-        }))
+        const res = result(p.win, p.status);
+        return h('tr.glpt.' + (res === '1' ? ' win' : (res === '0' ? ' loss' : '')), {
+          key: p.id,
+          attrs: { 'data-href': '/' + p.id + '/' + p.color },
+          hook: {
+            destroy: vnode => $.powerTip.destroy(vnode.elm as HTMLElement)
+          }
+        }, [
+          h('th', '' + (Math.max(nb.game, pairingsLen) - i)),
+          h('td', playerName(p.op)),
+          h('td', p.op.rating),
+          h('td.is.color-icon.' + p.color),
+          h('td', res)
+        ]);
+      }))
     ])
   ]);
+  console.log(ret)
+  return ret;
 };
