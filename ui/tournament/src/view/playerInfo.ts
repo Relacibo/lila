@@ -61,8 +61,9 @@ export default function(ctrl: TournamentController): VNode {
   ]);
   const nb = data.player.nb,
   pairingsLen = data.pairings.length,
-  pairingsHead = pairingsLen ? data.pairings[0] : null,
-  runningPairing = pairingsHead && pairingsHead.status === status.ids.started ? pairingsHead : null,
+  [head, ...tail] = data.pairings,
+  runningPairing = pairingsLen && head.status === status.ids.started ? head : null, 
+  finishedPairings = runningPairing ? tail : data.pairings,
   avgOp = pairingsLen ? Math.round(data.pairings.reduce(function(a, b) {
     return a + b.op.rating;
   }, 0) / pairingsLen) : undefined;
@@ -94,14 +95,14 @@ export default function(ctrl: TournamentController): VNode {
           ] : [])
       ])
     ]),
-    runningPairing ? preview(data.playerInfo, runningPairing) : null,
+    runningPairing ? preview(ctrl.playerInfo.player, runningPairing) : null,
     h('div', [
       h('table.pairings.sublist', {
         hook: bind('click', e => {
           const href = ((e.target as HTMLElement).parentNode as HTMLElement).getAttribute('data-href');
           if (href) window.open(href, '_blank');
         })
-      }, data.pairings.map(function(p, i) {
+      }, finishedPairings.map(function(p, i) {
         const res = result(p.win, p.status);
         return h('tr.glpt.' + (res === '1' ? ' win' : (res === '0' ? ' loss' : '')), {
           key: p.id,
@@ -110,7 +111,7 @@ export default function(ctrl: TournamentController): VNode {
             destroy: vnode => $.powerTip.destroy(vnode.elm as HTMLElement)
           }
         }, [
-          h('th', '' + (Math.max(nb.game, pairingsLen) - i)),
+          h('th', '' + (Math.max(nb.game, pairingsLen) - i - 1)),
           h('td', playerName(p.op)),
           h('td', p.op.rating),
           h('td.is.color-icon.' + p.color),
@@ -119,6 +120,7 @@ export default function(ctrl: TournamentController): VNode {
       }))
     ])
   ]);
+  console.log("ret: ")
   console.log(ret)
   return ret;
 };
