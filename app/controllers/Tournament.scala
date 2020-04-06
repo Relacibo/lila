@@ -81,8 +81,8 @@ final class Tournament(
   }
 
   private[controllers] def canHaveChat(tour: Tour, json: Option[JsObject])(implicit ctx: Context): Boolean =
-    !ctx.kid &&                                            // no public chats for kids
-      ctx.me.fold(!tour.isPrivate) { u =>                  // anon can see public chats, except for private tournaments
+    !ctx.kid &&                                                                        // no public chats for kids
+      ctx.me.fold(!tour.isPrivate) { u =>                                              // anon can see public chats, except for private tournaments
         (!tour.isPrivate || json.fold(true)(jsonHasMe) || isGranted(_.ChatTimeout)) && // private tournament that I joined or has ChatTimeout
         env.chat.panic.allowed(u, tighter = tour.variant == chess.variant.Antichess)
       }
@@ -220,7 +220,7 @@ final class Tournament(
   def form = Auth { implicit ctx => me =>
     NoLameOrBot {
       teamC.teamsIBelongTo(me) map { teams =>
-        Ok(html.tournament.form.create(forms.create(me), me, teams))
+        Ok(html.tournament.form.create(forms.create(me), teams))
       }
     }
   }
@@ -229,7 +229,7 @@ final class Tournament(
     NoLameOrBot {
       env.team.api.owns(teamId, me.id) map {
         _ ?? {
-          Ok(html.tournament.form.create(forms.create(me, teamId.some), me, Nil))
+          Ok(html.tournament.form.create(forms.create(me, teamId.some), Nil))
         }
       }
     }
@@ -279,7 +279,7 @@ final class Tournament(
             .create(me)
             .bindFromRequest
             .fold(
-              err => BadRequest(html.tournament.form.create(err, me, teams)).fuccess,
+              err => BadRequest(html.tournament.form.create(err, teams)).fuccess,
               setup =>
                 rateLimitCreation(me, setup.isPrivate, ctx.req) {
                   api.createTournament(setup, me, teams, getUserTeamIds) map { tour =>
@@ -398,7 +398,7 @@ final class Tournament(
     WithEditableTournament(id, me) { tour =>
       teamC.teamsIBelongTo(me) map { teams =>
         val form = forms.edit(me, tour)
-        Ok(html.tournament.form.edit(tour, form, me, teams))
+        Ok(html.tournament.form.edit(tour, form, teams))
       }
     }
   }
@@ -411,7 +411,7 @@ final class Tournament(
           .edit(me, tour)
           .bindFromRequest
           .fold(
-            err => BadRequest(html.tournament.form.edit(tour, err, me, teams)).fuccess,
+            err => BadRequest(html.tournament.form.edit(tour, err, teams)).fuccess,
             data => api.update(tour, data, teams) inject Redirect(routes.Tournament.show(id)).flashSuccess
           )
       }
