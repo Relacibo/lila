@@ -46,17 +46,12 @@ final class Env(
 
   val isHosting = new lila.round.IsSimulHost(u => api.currentHostIds dmap (_ contains u))
 
-  val allCreated = cacheApi.unit[List[Simul]] {
-    _.refreshAfterWrite(3 seconds)
-      .buildAsyncFuture(_ => repo.allCreated)
-  }
-
   val allCreatedFeaturable = cacheApi.unit[List[Simul]] {
     _.refreshAfterWrite(3 seconds)
       .buildAsyncFuture(_ => repo.allCreatedFeaturable)
   }
 
-  val featurable = (simul: Simul) => featureLimiter(simul.hostId)(true)
+  val featurable = new SimulIsFeaturable((simul: Simul) => featureLimiter(simul.hostId)(true))
 
   private val featureLimiter = new lila.memo.RateLimit[lila.user.User.ID](
     credits = config.featureViews.value,
@@ -68,8 +63,6 @@ final class Env(
 
   def version(simulId: Simul.ID) =
     simulSocket.rooms.ask[SocketVersion](simulId)(GetVersion)
-
-  lazy val cleaner = new SimulCleaner(repo, api)
 
   Bus.subscribeFuns(
     "finishGame" -> {
@@ -92,6 +85,8 @@ final class Env(
         )
     }
   )
+}
 
-  system.scheduler.scheduleWithFixedDelay(30 seconds, 30 seconds)(() => cleaner.cleanUp)
+final class SimulIsFeaturable(f: Simul => Boolean) extends (Simul => Boolean) {
+  def apply(simul: Simul) = f(simul)
 }
