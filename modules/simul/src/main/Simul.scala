@@ -125,6 +125,9 @@ case class Simul(
 
   private def Created(s: => Simul): Simul = if (isCreated) s else this
 
+  def visible =
+    (hostRating >= 2000 || hostTitle.isDefined) && isCreated
+
   def spotlightable =
     (hostRating >= 2400 || hostTitle.isDefined) &&
       isCreated &&
@@ -142,12 +145,9 @@ object Simul {
 
   case class OnStart(simul: Simul)
 
-  private def makeName(host: User) =
-    if (host.title.isDefined) host.titleUsername
-    else RandomName()
-
   def make(
       host: User,
+      name: String,
       clock: SimulClock,
       variants: List[Variant],
       position: Option[StartingPosition],
@@ -156,7 +156,7 @@ object Simul {
       team: Option[String]
   ): Simul = Simul(
     _id = Random nextString 8,
-    name = makeName(host),
+    name = name,
     status = SimulStatus.Created,
     clock = clock,
     hostId = host.id,
