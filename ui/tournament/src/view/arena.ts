@@ -17,6 +17,10 @@ function playerTr(ctrl: TournamentController, player) {
   const userId = player.name.toLowerCase(),
     nbScores = player.sheet.scores.length;
   const battle = ctrl.data.teamBattle;
+  console.log('ctrl')
+  console.log(ctrl)
+  console.log('player')
+  console.log(player)
   return h('tr', {
     key: userId,
     class: {
@@ -35,13 +39,23 @@ function playerTr(ctrl: TournamentController, player) {
     }) : player.rank),
     h('td.player', [
       renderPlayer(player, false, true, userId === ctrl.data.defender),
-      ...(battle && player.team ? [' ', teamName(battle, player.team)] : [])
+      ...(battle && player.team ? [' ', teamName(battle, player.team)] : []),
+      h('div.versus', [
+        h('span.versus-symbol', {
+          attrs: {
+            'data-icon': 'U',
+            'title': 'vs'
+          }
+        }),
+        h('span.versus-name', 'magnus_carlsen_the_great_king_of_norway')
+      ])
     ]),
+    ,
     h('td.sheet', player.sheet.scores.map(scoreTag)),
     h('td.total', [
       player.sheet.fire && !ctrl.data.isFinished ?
-      h('strong.is-gold', { attrs: dataIcon('Q') }, player.sheet.total) :
-      h('strong', player.sheet.total)
+        h('strong.is-gold', { attrs: dataIcon('Q') }, player.sheet.total) :
+        h('strong', player.sheet.total)
     ])
   ]);
 }
