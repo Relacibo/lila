@@ -21,7 +21,7 @@ $small-display: 768px;
     flex-wrap: wrap;
     align-items: center;
     min-width: 0;
-    padding-left: 0;
+    padding: 0;
     padding-right: 0.5rem;
     max-width: 45%;
     flex: 1 auto;
@@ -42,14 +42,22 @@ $small-display: 768px;
   .versus {
     display: inline-flex;
     align-items: center;
-    font-size: 10px;
-    color: c-dimmer($c-font, 10%);
-    white-space: nowrap;
+    flex: 1 auto;
+    flex-wrap: nowrap;
+    font-size: 9px;
+    color: c-dimmer($c-font, 30%);
   }
+
+  tr:nth-child(even) {
+    .versus {
+      color: c-dimmer($c-font, 27%);
+    }
+  }
+
   .versus-name {
     @extend %nowrap-ellipsis;
-    vertical-align: middle;
-    flex: .4 1 auto;
+    align-items: center;
+    flex: 0.4 1 auto;
     padding-left: 2px;
     max-width: 150px;
   }
