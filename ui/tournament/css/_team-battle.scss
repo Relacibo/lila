@@ -50,6 +50,7 @@ team {
       color: $c-link;
     }
     team {
+      flex-wrap: nowrap;
       font-size: 1rem;
     }
   }

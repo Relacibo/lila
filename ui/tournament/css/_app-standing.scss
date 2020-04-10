@@ -21,35 +21,41 @@
     align-items: center;
     min-width: 0;
     padding-left: 0;
-    padding-right: .5rem;
+    padding-right: 0.5rem;
     max-width: 45%;
     flex: 1 auto;
   }
-  
+
   .user-link {
     display: inline-flex;
-    flex-wrap: nowrap;
     align-items: center;
     .name {
       @extend %nowrap-ellipsis;
       padding-right: 4px;
     }
+    .rating {
+      font-style: italic;
+      font-size: 0.8em;
+      padding-right: 10px;
+    }
   }
-  .user-link.long {
+
+  .long.user-link {
     letter-spacing: -0.7px;
   }
-  .user-link .rating {
-    font-style: italic;
-    font-size: .8em;
-    padding-right: 10px;
+
+  tr.long {
+    &.rating {
+      padding-left: 0;
+    }
+    &.name {
+      width: 100%;
+    }
   }
-  tr.long .user-link .rating {
-    padding-left: 0;
-  }
-  
+
   .loading tbody {
     opacity: 0.6;
-    @include transition(opacity, .3s);
+    @include transition(opacity, 0.3s);
   }
   &:not(.created):not(.loading) tbody tr:hover {
     background: mix($c-primary, $c-bg-box, 30%);
@@ -61,23 +67,23 @@
     align-self: stretch;
     align-items: center;
     padding-left: 10px;
-    padding-right: .8rem;
+    padding-right: 0.8rem;
     i {
-      opacity: .4;
-      font-size: .8em;
+      opacity: 0.4;
+      font-size: 0.8em;
     }
   }
 
   .sheet {
     display: inline-flex;
     flex: 1 0 auto;
-    max-width: 65%;
+    max-width: 70%;
     margin-left: auto;
     justify-content: flex-end;
     flex-wrap: wrap-reverse;
     padding-right: 0;
     padding-left: 1.5rem;
-    letter-spacing: .1em;
+    letter-spacing: 0.1em;
     score {
       opacity: 0.7;
     }
@@ -87,12 +93,12 @@
     }
   }
   tr.long .sheet {
-    font-size: .9rem;
-    letter-spacing: .06em;
+    font-size: 0.9rem;
+    letter-spacing: 0.06em;
   }
   tr.xlong .sheet {
-    font-size: .85rem;
-    letter-spacing: .04em;
+    font-size: 0.85rem;
+    letter-spacing: 0.04em;
   }
 
   double {
@@ -120,19 +126,24 @@
     }
   }
 
-  tr.long .total {
-    width: 4rem;
-    @media mq-not-small {
-      width: 3rem;
-    }
-  }
-
   tr.me td:first-child {
     $c-me-border: mix($c-secondary, $c-bg-box, 70%);
-    background: linear-gradient(to right, $c-me-border 0, $c-me-border 5px, rgba(0,0,0,0) 5px, rgba(0,0,0,0) 100%);
+    background: linear-gradient(
+      to right,
+      $c-me-border 0,
+      $c-me-border 5px,
+      rgba(0, 0, 0, 0) 5px,
+      rgba(0, 0, 0, 0) 100%
+    );
   }
   tr.active td:last-child {
     $c-active-border: mix($c-primary, $c-bg-box, 70%);
-    background: linear-gradient(to left, $c-active-border 0, $c-active-border 5px, rgba(0,0,0,0) 5px, rgba(0,0,0,0) 100%);
+    background: linear-gradient(
+      to left,
+      $c-active-border 0,
+      $c-active-border 5px,
+      rgba(0, 0, 0, 0) 5px,
+      rgba(0, 0, 0, 0) 100%
+    );
   }
 }
